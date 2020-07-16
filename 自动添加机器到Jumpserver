@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# Version: v1.0
+"""
+    1. 搭建好环境
+    2. 开启2.0的api接口, 修改vi jumpserver/config.yml， 启用DEBUG: true选择，重启
+    3. 登录创建(管理和系统)账号、资产、节点、配置好授权
+    4. 准备好服务器的配置信息
+    5. 调用脚本，自动添加并授权
+"""
+
+import requests
+import json
+
+
+class JumpServer(object):
+    def __init__(self):
+        self.url = "http://172.16.3.211/api/v1"
+        self.header_info = {"Authorization": "Bearer " + self.get_token()}
+
+    def get_token(self):
+        """获取token信息"""
+        url = self.url + "/authentication/auth/"
+        query_args = {"username": "admin", "password": "admin"}
+        response = requests.post(url, data=query_args)
+        return json.loads(response.text)["token"]
+
+    def get_platforms(self):
+        """获取平台环境信息"""
+        url = self.url + "/assets/platforms/"
+        response = requests.get(url, headers=self.header_info)
+        print(json.loads(response.text))
+
+    def get_user_info(self):
+        """获取用户信息"""
+        url = self.url + "/users/users/"
+        response = requests.get(url, headers=self.header_info)
+        print(json.loads(response.text))
+
+    def get_asset_info(self):
+        """获取资产清单"""
+        url = self.url + "/assets/assets/"
+        response = requests.get(url, headers=self.header_info)
+        print(json.loads(response.text))
+
+    def add_asset(self, host_dict):
+        """
+        增加资产
+        :param host_dict: 需要提供ip, hostname, platform， nodes， is_active参数
+        :return:
+        """
+        url = self.url + "/assets/assets/"
+        response = requests.post(url, headers=self.header_info, data=host_dict)
+        print(json.loads(response.text))
+
+    def get_asset_permissions(self):
+        """获取资产权限"""
+        url = self.url + "/perms/asset-permissions-nodes-relations/"
+        response = requests.get(url, headers=self.header_info)
+        print(json.loads(response.text))
+
+    def get_nodes_info(self):
+        """获取节点树的信息"""
+        url = self.url + "/assets/nodes/"
+        response = requests.get(url, headers=self.header_info)
+        print(json.loads(response.text))
+
+    def add_asset_permissions(self):
+        """添加资产授权功能"""
+        url = self.url + "/perms/asset-permissions-nodes-relations/"
+        response = requests.post(url, headers=self.header_info)
+        print(json.loads(response.text))
+
+n = JumpServer()
+# n.get_asset_info()
+# n.get_platforms()
+host_info = {
+        "ip": "172.16.3.222",
+        "hostname": "172.16.3.222",
+        "platform": "Linux",
+        'nodes': ['fd561570-c4eb-4870-8315-df8c34509e31'],
+        'is_active': True,
+    }
+# n.add_asset(new_host)
+host_permission={
+    "node": "",
+    "assetpermission":"",
+    "assetpermission_display":"",
+}
+# n.get_asset_permissions()
+# n.add_asset_permissions()
+n.get_nodes_info()
